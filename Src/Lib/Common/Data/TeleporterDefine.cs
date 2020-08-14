@@ -17,3 +17,4 @@ namespace Common.Data
         public NVector3 Direction { get; set; }
     }
 }
+

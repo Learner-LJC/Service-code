@@ -1,76 +1,98 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Entities;
+using Managers;
+using Models;
 using UnityEngine;
 
-using Entities;
-using Services;
-using SkillBridge.Message;
-
-public class GameObjectManager : MonoBehaviour
+namespace Assets.Scripts.GameObject
 {
-
-    Dictionary<int, GameObject> Characters = new Dictionary<int, GameObject>();
-    // Use this for initialization
-    void Start()
-    {
-        StartCoroutine(InitGameObjects());
-        CharacterManager.Instance.OnCharacterEnter = OnCharacterEnter;
-    }
-
-    private void OnDestroy()
-    {
-        CharacterManager.Instance.OnCharacterEnter = null;
-    }
-
-    // Update is called once per frame
-    void Update()
+    public class GameObjectManager : MonoSingleton<GameObjectManager>
     {
 
-    }
+        Dictionary<int, UnityEngine.GameObject> Characters = new Dictionary<int, UnityEngine.GameObject>();
+        // Use this for initialization
+        protected override void OnStart()
+        {
+            StartCoroutine(InitGameObjects());
+            CharacterManager.Instance.OnCharacterEnter += OnCharacterEnter;
+            CharacterManager.Instance.OnCharacterLeave += OnCharacterLeave;
+        }
 
-    void OnCharacterEnter(Character cha)
-    {
-        CreateCharacterObject(cha);
-    }
+        private void OnDestroy()
+        {
+            CharacterManager.Instance.OnCharacterEnter -= OnCharacterEnter;
+            CharacterManager.Instance.OnCharacterLeave -= OnCharacterLeave;
+        }
 
-    IEnumerator InitGameObjects()
-    {
-        foreach (var cha in CharacterManager.Instance.Characters.Values)
+        // Update is called once per frame
+        void Update()
+        {
+
+        }
+
+        void OnCharacterEnter(Character cha)
         {
             CreateCharacterObject(cha);
-            yield return null;
         }
-    }
 
-    private void CreateCharacterObject(Character character)
-    {
-        if (!Characters.ContainsKey(character.Info.Id) || Characters[character.Info.Id] == null)
+        void OnCharacterLeave(Character character)
         {
-            Object obj = Resloader.Load<Object>(character.Define.Resource);
-            if(obj == null)
-            {
-                Debug.LogErrorFormat("Character[{0}] Resource[{1}] not existed.",character.Define.TID, character.Define.Resource);
+            if (!Characters.ContainsKey(character.entityId))
                 return;
-            }
-            GameObject go = (GameObject)Instantiate(obj);
-            go.name = "Character_" + character.Info.Id + "_" + character.Info.Name;
 
+            if (Characters[character.entityId]!=null)
+            {
+                Destroy(Characters[character.entityId]);
+                this.Characters.Remove(character.entityId);
+            }
+        }
+        IEnumerator InitGameObjects()
+        {
+            foreach (var cha in CharacterManager.Instance.Characters.Values)
+            {
+                CreateCharacterObject(cha);
+                yield return null;
+            }
+        }
+
+        private void CreateCharacterObject(Character character)
+        {
+            if (!Characters.ContainsKey(character.entityId) || Characters[character.entityId] == null)
+            {
+                Object obj = Resloader.Load<Object>(character.Define.Resource);
+                if(obj == null)
+                {
+                    Debug.LogErrorFormat("Character[{0}] Resource[{1}] not existed.",character.Define.TID, character.Define.Resource);
+                    return;
+                }
+                UnityEngine.GameObject go = (UnityEngine.GameObject)Instantiate(obj, this.transform);
+                go.name = "Character_" + character.Info.Id + "_" + character.Name;
+                Characters[character.entityId] = go; 
+
+                UIWorldElementManager.Instance.AddCharacterNameBar(go.transform, character);
+            }
+            this.InitGameObject(Characters[character.entityId], character);
+        }
+
+        private void InitGameObject(UnityEngine.GameObject go, Character character)
+        {
             go.transform.position = GameObjectTool.LogicToWorld(character.position);
             go.transform.forward = GameObjectTool.LogicToWorld(character.direction);
-            Characters[character.Info.Id] = go;
-
             EntityController ec = go.GetComponent<EntityController>();
             if (ec != null)
             {
                 ec.entity = character;
                 ec.isPlayer = character.IsPlayer;
-            }
             
+            }
             PlayerInputController pc = go.GetComponent<PlayerInputController>();
             if (pc != null)
             {
-                if (character.Info.Id == Models.User.Instance.CurrentCharacter.Id)
+                //info,id=entityid
+                if (character.entityId==Models.User.Instance.CurrentCharacter.Id)
                 {
+                    User.Instance.CurrentCharacterObject = go;
                     MainPlayerCamera.Instance.player = go;
                     pc.enabled = true;
                     pc.character = character;
@@ -81,8 +103,10 @@ public class GameObjectManager : MonoBehaviour
                     pc.enabled = false;
                 }
             }
-            UIWorldElementManager.Instance.AddCharacterNameBar(go.transform, character);
         }
+
+
+   
     }
 }
 

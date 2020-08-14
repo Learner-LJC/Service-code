@@ -1,96 +1,111 @@
-﻿using SkillBridge.Message;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using Assets.Scripts.Managers;
 using Entities;
+using SkillBridge.Message;
+using UnityEngine;
 
-
-public class EntityController : MonoBehaviour
+namespace Assets.Scripts.GameObject
 {
+    public class EntityController : MonoBehaviour,IEntityNotify
+    {
 
-    public Animator anim;
-    public Rigidbody rb;
-    private AnimatorStateInfo currentBaseState;
+        public Animator anim;
+        public Rigidbody rb;
+        private AnimatorStateInfo currentBaseState;
 
-    public Entity entity;
+        public Entity entity;
 
-    public UnityEngine.Vector3 position;
-    public UnityEngine.Vector3 direction;
-    Quaternion rotation;
+        public UnityEngine.Vector3 position;
+        public UnityEngine.Vector3 direction;
+        Quaternion rotation;
 
-    public UnityEngine.Vector3 lastPosition;
-    Quaternion lastRotation;
+        public UnityEngine.Vector3 lastPosition;
+        Quaternion lastRotation;
 
-    public float speed;
-    public float animSpeed = 1.5f;
-    public float jumpPower = 3.0f;
+        public float speed;
+        public float animSpeed = 1.5f;
+        public float jumpPower = 3.0f;
 
-    public bool isPlayer = false;
+        public bool isPlayer = false;
 
-    // Use this for initialization
-    void Start () {
-        if (entity != null)
-        {
-            this.UpdateTransform();
+        // Use this for initialization
+        void Start () {
+            if (entity != null)
+            {
+                EntityManager.Instance.RegisterEntityCharacterNotify(entity.entityId,this);
+                this.UpdateTransform();
+            }
+
+            if (!this.isPlayer)
+                rb.useGravity = false;
         }
 
-        if (!this.isPlayer)
-            rb.useGravity = false;
-    }
+        void UpdateTransform()
+        {
+            this.position = GameObjectTool.LogicToWorld(entity.position);
+            this.direction = GameObjectTool.LogicToWorld(entity.direction);
 
-    void UpdateTransform()
-    {
-        this.position = GameObjectTool.LogicToWorld(entity.position);
-        this.direction = GameObjectTool.LogicToWorld(entity.direction);
-
-        this.rb.MovePosition(this.position);
-        this.transform.forward = this.direction;
-        this.lastPosition = this.position;
-        this.lastRotation = this.rotation;
-    }
+            this.rb.MovePosition(this.position);
+            this.transform.forward = this.direction;
+            this.lastPosition = this.position;
+            this.lastRotation = this.rotation;
+        }
 	
-    void OnDestroy()
-    {
-        if (entity != null)
-            Debug.LogFormat("{0} OnDestroy :ID:{1} POS:{2} DIR:{3} SPD:{4} ", this.name, entity.entityId, entity.position, entity.direction, entity.speed);
-
-        if(UIWorldElementManager.Instance!=null)
+        void OnDestroy()
         {
-            UIWorldElementManager.Instance.RemoveCharacterNameBar(this.transform);
+            if (entity != null)
+                Debug.LogFormat("{0} OnDestroy :ID:{1} POS:{2} DIR:{3} SPD:{4} ", this.name, entity.entityId, entity.position, entity.direction, entity.speed);
+
+            if(UIWorldElementManager.Instance!=null)
+            {
+                UIWorldElementManager.Instance.RemoveCharacterNameBar(this.transform);
+            }
         }
-    }
 
-    // Update is called once per frame
-    void FixedUpdate()
-    {
-        if (this.entity == null)
-            return;
-
-        this.entity.OnUpdate(Time.fixedDeltaTime);
-
-        if (!this.isPlayer)
+        // Update is called once per frame
+        void FixedUpdate()
         {
-            this.UpdateTransform();
+            if (this.entity == null)
+                return;
+
+            this.entity.OnUpdate(Time.fixedDeltaTime);
+
+            if (!this.isPlayer)
+            {
+                this.UpdateTransform();
+            }
         }
-    }
 
-    public void OnEntityEvent(EntityEvent entityEvent)
-    {
-        switch(entityEvent)
+        public void OnEntityEvent(EntityEvent entityEvent)
         {
-            case EntityEvent.Idle:
-                anim.SetBool("Move", false);
-                anim.SetTrigger("Idle");
-                break;
-            case EntityEvent.MoveFwd:
-                anim.SetBool("Move", true);
-                break;
-            case EntityEvent.MoveBack:
-                anim.SetBool("Move", true);
-                break;
-            case EntityEvent.Jump:
-                anim.SetTrigger("Jump");
-                break;
+            switch(entityEvent)
+            {
+                case EntityEvent.Idle:
+                    anim.SetBool("Move", false);
+                    anim.SetTrigger("Idle");
+                    break;
+                case EntityEvent.MoveFwd:
+                    anim.SetBool("Move", true);
+                    break;
+                case EntityEvent.MoveBack:
+                    anim.SetBool("Move", true);
+                    break;
+                case EntityEvent.Jump:
+                    anim.SetTrigger("Jump");
+                    break;
+            }
+        }
+
+        public void OnEntityRemove()
+        {
+            if (UIWorldElementManager.Instance!=null)
+                UIWorldElementManager.Instance.RemoveCharacterNameBar(this.transform);
+            Destroy(this.gameObject);
+        
+        }
+
+        public void OnEntityChanged(Entity entity)
+        {
+            Debug.LogFormat("OnEntityChanged :ID:{0} POS:{1} DIR:{2} SPD:{3}",entity.entityId,entity.position,entity.direction,entity.speed);
         }
     }
 }

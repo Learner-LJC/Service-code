@@ -11,6 +11,7 @@ using Common.Data;
 using Network;
 using GameServer.Managers;
 using GameServer.Entities;
+using GameServer.Services;
 
 namespace GameServer.Models
 {
@@ -46,6 +47,24 @@ namespace GameServer.Models
         {
         }
 
+        
+        internal void UpdateEntity(NEntitySync entity)
+        {
+            foreach (var kv in this.MapCharacters)
+            {
+                if (kv.Value.character.entityId==entity.Id)
+                {
+                    kv.Value.character.Position = entity.Entity.Position;
+                    kv.Value.character.Direction = entity.Entity.Direction;
+                    kv.Value.character.Speed = entity.Entity.Speed;
+                }
+                else
+                {
+                    MapService.Instance.SendEntityUpdate(kv.Value.connection, entity);
+                }
+            }
+        }
+
         /// <summary>
         /// 角色进入地图
         /// </summary>
@@ -75,11 +94,34 @@ namespace GameServer.Models
             conn.SendData(data, 0, data.Length);
         }
 
+        internal void CharacterLeave(Character cha)
+        {
+            Log.InfoFormat("CharacterLeave:Map:{0} character{1}",this.Define.ID,cha.Id);
+            foreach (var kv in this.MapCharacters)
+            {
+                this.SendCharacterLeaveMap(kv.Value.connection, cha);
+            }
+
+            this.MapCharacters.Remove(cha.Id);
+        }
+
+        void SendCharacterLeaveMap(NetConnection<NetSession> conn, Character character)
+        {
+            NetMessage message=new NetMessage();
+            message.Response=new NetMessageResponse();
+
+            message.Response.mapCharacterLeave=new MapCharacterLeaveResponse();
+            message.Response.mapCharacterLeave.characterId = character.Id;
+
+            byte[] data = PackageHandler.PackMessage(message);
+            conn.SendData(data,0,data.Length);
+        }
+
         void SendCharacterEnterMap(NetConnection<NetSession> conn, NCharacterInfo character)
         {
             NetMessage message = new NetMessage();
             message.Response = new NetMessageResponse();
-
+            //
             message.Response.mapCharacterEnter = new MapCharacterEnterResponse();
             message.Response.mapCharacterEnter.mapId = this.Define.ID;
             message.Response.mapCharacterEnter.Characters.Add(character);
@@ -87,5 +129,6 @@ namespace GameServer.Models
             byte[] data = PackageHandler.PackMessage(message);
             conn.SendData(data, 0, data.Length);
         }
+
     }
 }

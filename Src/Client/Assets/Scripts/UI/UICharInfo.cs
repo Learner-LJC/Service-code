@@ -30,8 +30,5 @@ public class UICharInfo : MonoBehaviour {
         }
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+	
 }

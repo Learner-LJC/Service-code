@@ -10,10 +10,6 @@ using System.Threading.Tasks;
 
 namespace GameServer.Entities
 {
-    /// <summary>
-    /// Character
-    /// 玩家角色类
-    /// </summary>
     class Character : CharacterBase
     {
        
@@ -33,7 +29,7 @@ namespace GameServer.Entities
             this.Info.Class = (CharacterClass)cha.Class;
             this.Info.mapId = cha.MapID;
             this.Info.Entity = this.EntityData;
-
+            //this.Define = DataManager.Instance.Characters[this.Info.Tid];
         }
     }
 }

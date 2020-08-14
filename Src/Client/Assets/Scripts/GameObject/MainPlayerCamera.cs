@@ -1,29 +1,28 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Models;
 using UnityEngine;
 
-public class MainPlayerCamera : MonoSingleton<MainPlayerCamera>
+namespace Assets.Scripts.GameObject
 {
-    public Camera camera;
-    public Transform viewPoint;
-
-    public GameObject player;
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
-    private void LateUpdate()
+    public class MainPlayerCamera : MonoSingleton<MainPlayerCamera>
     {
-        if (player == null)
-            return;
+        public Camera camera;
+        public Transform viewPoint;
 
-        this.transform.position = player.transform.position;
-        this.transform.rotation = player.transform.rotation;
+        public UnityEngine.GameObject player;
+        // Use this for initialization
+	
+
+        private void LateUpdate()
+        {
+            if (player == null)
+            {
+                player = User.Instance.CurrentCharacterObject;
+            }
+            if (player == null)
+                return;
+
+            this.transform.position = player.transform.position;
+            this.transform.rotation = player.transform.rotation;
+        }
     }
 }

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Common;
 namespace GameServer.Entities
 {
     class Entity
@@ -62,6 +62,8 @@ namespace GameServer.Entities
                 this.SetEntityData(value);
             }
         }
+
+        
 
         public Entity(Vector3Int pos,Vector3Int dir)
         {
