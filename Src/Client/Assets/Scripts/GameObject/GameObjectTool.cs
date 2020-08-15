@@ -1,8 +1,7 @@
 ﻿using SkillBridge.Message;
 using UnityEngine;
 
-namespace Assets.Scripts.GameObject
-{
+
     public class GameObjectTool
     {
         public static Vector3 LogicToWorld(NVector3 vector)
@@ -70,4 +69,3 @@ namespace Assets.Scripts.GameObject
             return updated;
         }
     }
-}

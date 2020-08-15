@@ -1,8 +1,6 @@
 ﻿using Models;
 using UnityEngine;
 
-namespace Assets.Scripts.GameObject
-{
     public class MainPlayerCamera : MonoSingleton<MainPlayerCamera>
     {
         public Camera camera;
@@ -25,4 +23,4 @@ namespace Assets.Scripts.GameObject
             this.transform.rotation = player.transform.rotation;
         }
     }
-}
+

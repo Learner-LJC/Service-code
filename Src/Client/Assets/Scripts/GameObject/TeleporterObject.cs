@@ -1,7 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using Assets.Scripts.GameObject;
-using Assets.Scripts.Services;
 using Common.Data;
 using Managers;
 using Services;
@@ -15,7 +13,7 @@ public class TeleporterObject : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
-        this.mesh = this.GetComponent<MeshFilter>().sharedMesh;
+        this.mesh = GetComponent<MeshFilter>().sharedMesh;
     }
 	
 	// Update is called once per frame
@@ -36,7 +34,8 @@ public class TeleporterObject : MonoBehaviour
 #endif
     void OnTriggerEnter(Collider other)
     {
-        PlayerInputController playControl = GetComponent<PlayerInputController>();
+        Debug.Log("碰撞进入角色");
+        PlayerInputController playControl = other.GetComponent<PlayerInputController>();
         if (playControl != null && playControl.isActiveAndEnabled)
         {
             TeleporterDefine td = DataManager.Instance.Teleporters[this.ID];

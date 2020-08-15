@@ -5,8 +5,7 @@ using Managers;
 using Models;
 using UnityEngine;
 
-namespace Assets.Scripts.GameObject
-{
+
     public class GameObjectManager : MonoSingleton<GameObjectManager>
     {
 
@@ -108,5 +107,5 @@ namespace Assets.Scripts.GameObject
 
    
     }
-}
+
 

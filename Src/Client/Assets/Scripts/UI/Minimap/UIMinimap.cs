@@ -29,7 +29,7 @@ public class UIMinimap : MonoBehaviour
         this.minimap.overrideSprite = MinimapManager.Instance.LoadSpriteMinimap();
         this.minimap.SetNativeSize();
         this.minimap.transform.localPosition = Vector3.zero;
-        this.MinimapBuildingBox = MinimapManager.Instance.MinimapBoundingBox;
+        this.MinimapBuildingBox = MinimapManager.Instance.MinimapBuildingBox;
         this.playerTransform = null;
     }
 	// Update is called once per frame

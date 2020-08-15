@@ -1,12 +1,10 @@
-﻿using Entities;
+﻿
+using Entities;
 using Managers;
 using Services;
 using SkillBridge.Message;
 using UnityEngine;
-
-namespace Assets.Scripts.GameObject
-{
-    public class PlayerInputController : MonoBehaviour {
+   public class PlayerInputController : MonoBehaviour {
 
         public Rigidbody rb;
         SkillBridge.Message.CharacterState state;
@@ -132,5 +130,5 @@ namespace Assets.Scripts.GameObject
                 entityController.OnEntityEvent(entityEvent);
             MapService.Instance.SendMapEntitySync(entityEvent, this.character.EntityData);
         }
-    }
-}
+   }
+

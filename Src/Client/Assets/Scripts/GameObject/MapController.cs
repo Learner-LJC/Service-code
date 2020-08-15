@@ -1,8 +1,7 @@
 ﻿using Managers;
 using UnityEngine;
 
-namespace Assets.Scripts.GameObject
-{
+
     public class MapController : MonoBehaviour
     {
         public Collider minimapBoundingbox;
@@ -16,4 +15,3 @@ namespace Assets.Scripts.GameObject
 		
         }
     }
-}

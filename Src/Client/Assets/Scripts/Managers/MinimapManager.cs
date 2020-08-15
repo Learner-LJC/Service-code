@@ -11,7 +11,7 @@ namespace Managers
     {
         public UIMinimap minimap;
         private Collider minimapBoundingBox;
-        public Collider MinimapBoundingBox
+        public Collider MinimapBuildingBox
         {
             get { return minimapBoundingBox; }
         }

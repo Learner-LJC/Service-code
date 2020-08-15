@@ -1,10 +1,11 @@
-﻿using Assets.Scripts.Managers;
+﻿
+using Assets.Scripts.GameObject;
+using Assets.Scripts.Managers;
 using Entities;
 using SkillBridge.Message;
 using UnityEngine;
 
-namespace Assets.Scripts.GameObject
-{
+
     public class EntityController : MonoBehaviour,IEntityNotify
     {
 
@@ -108,4 +109,3 @@ namespace Assets.Scripts.GameObject
             Debug.LogFormat("OnEntityChanged :ID:{0} POS:{1} DIR:{2} SPD:{3}",entity.entityId,entity.position,entity.direction,entity.speed);
         }
     }
-}
