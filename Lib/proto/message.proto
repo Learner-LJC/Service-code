@@ -49,7 +49,7 @@ enum ITEM_TYPE
 {
 	NORMAL=0;
 	MATERIAL=1;
-	TASK=2;//任务道具
+	TASK=2;//浠诲姟閬撳叿
 }
 message NUserInfo {
 	int32 id = 1;
